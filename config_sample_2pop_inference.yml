@@ -14,6 +14,8 @@ spatial_setup:
 seeding:
   method: FolderDraw
   lambda_file: data/seeding.csv
+  date_sd: 0
+  amount_sd: 0
 
 compartments:
   infection_stage: ["S", "E", "I", "R"]
@@ -54,3 +56,38 @@ seir:
       proportional_to: ["I"]
       proportion_exponent: ["1"]
 
+interventions:
+  scenarios:
+    - None
+  settings:
+    None:
+      template: Reduce
+      parameter: r0
+      period_start_date: 2020-04-01
+      period_end_date: 2020-05-15
+      value:
+        distribution: fixed
+        value: 0
+
+outcomes:
+  method: delayframe
+  scenarios:
+    - None
+  settings:
+    None:
+      incidI:
+        source:
+          incidence:
+            infection_stage: "I1"
+        probability:
+          value:
+            distribution: fixed
+            value: 1
+        delay:
+          value:
+            distribution: fixed
+            value: 0
+
+inference:
+  iterations_per_slot: 1
+  do_inference: FALSE

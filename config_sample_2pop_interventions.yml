@@ -54,3 +54,16 @@ seir:
       proportional_to: ["I"]
       proportion_exponent: ["1"]
 
+interventions:
+  scenarios:
+    - None
+  settings:
+    None:
+      template: Reduce
+      parameter: r0
+      period_start_date: 2020-04-01
+      period_end_date: 2020-05-15
+      value:
+        distribution: fixed
+        value: 0
+
