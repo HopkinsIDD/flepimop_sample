@@ -12,7 +12,7 @@ spatial_setup:
   nodenames: province_name
 
 seeding:
-  method: FolderDraw
+  method: PoissonDistributed
   lambda_file: data/seeding.csv
 
 compartments:
@@ -42,7 +42,7 @@ seir:
       destination: ["E"]
       rate: ["Ro * gamma"]
       proportional_to: [["S"],["I"]]
-      proportion_exponent: ["1"]
+      proportion_exponent: ["1","1"]
     - source: ["E"]
       destination: ["I"]
       rate: ["sigma"]
