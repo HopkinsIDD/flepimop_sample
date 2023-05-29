@@ -12,8 +12,8 @@ spatial_setup:
   nodenames: province_name
 
 seeding:
-  method: FromFile
-  seeding_file: data/seeding_2pop.csv
+  method: PoissonDistributed
+  lambda_file: data/seeding.csv
 
 compartments:
   infection_stage: ["S", "E", "I", "R"]
@@ -22,6 +22,7 @@ seir:
   integration:
     method: rk4
     dt: 1 / 10
+    stoch_traj_flag: 0
   parameters:
     sigma:
       value:
@@ -56,6 +57,7 @@ seir:
 interventions:
   scenarios:
     - None
+    - Lockdown
   settings:
     None:
       template: Reduce
@@ -65,4 +67,13 @@ interventions:
       value:
         distribution: fixed
         value: 0
+        settings:
+    Lockdown:
+      template: Reduce
+      parameter: r0
+      period_start_date: 2020-04-01
+      period_end_date: 2020-05-15
+      value:
+        distribution: fixed
+        value: 0.7
 

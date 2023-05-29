@@ -1,4 +1,4 @@
-name: sample_2pop
+name: sir
 setup_name: minimal
 start_date: 2020-01-31
 end_date: 2020-05-31
@@ -6,27 +6,23 @@ data_path: data
 nslots: 1
 
 spatial_setup:
-  geodata: geodata_sample_2pop.csv
-  mobility: mobility_sample_2pop.csv
+  geodata: geodata_sample_1pop.csv
+  mobility: mobility_sample_1pop.csv
   popnodes: population
-  nodenames: province_name
+  nodenames: name
 
 seeding:
   method: FromFile
-  seeding_file: data/seeding_2pop.csv
+  seeding_file: data/seeding_1pop.csv
 
 compartments:
-  infection_stage: ["S", "E", "I", "R"]
+  infection_stage: ["S", "I", "R"]
 
 seir:
   integration:
-    method: rk4
+    method: stochastic
     dt: 1 / 10
   parameters:
-    sigma:
-      value:
-        distribution: fixed
-        value: 1 / 4
     gamma:
       value:
         distribution: fixed
@@ -38,15 +34,10 @@ seir:
         high: 3
   transitions:
     - source: ["S"]
-      destination: ["E"]
+      destination: ["I"]
       rate: ["Ro * gamma"]
       proportional_to: [["S"],["I"]]
       proportion_exponent: ["1","1"]
-    - source: ["E"]
-      destination: ["I"]
-      rate: ["sigma"]
-      proportional_to: ["E"]
-      proportion_exponent: ["1"]
     - source: ["I"]
       destination: ["R"]
       rate: ["gamma"]
@@ -56,6 +47,7 @@ seir:
 interventions:
   scenarios:
     - None
+    - Lockdown
   settings:
     None:
       template: Reduce
@@ -65,4 +57,12 @@ interventions:
       value:
         distribution: fixed
         value: 0
-
+        settings:
+    Lockdown:
+      template: Reduce
+      parameter: r0
+      period_start_date: 2020-04-01
+      period_end_date: 2020-05-15
+      value:
+        distribution: fixed
+        value: 0.7
