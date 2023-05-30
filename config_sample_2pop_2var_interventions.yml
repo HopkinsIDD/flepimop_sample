@@ -15,13 +15,15 @@ seeding:
   method: FromFile
   seeding_file: data/seeding_2pop_2var.csv
 
+# not being read at all, not sure why!!
 inital_conditions:
-  method: FromFile
-  initial_conditions_file: data/ic_2pop_2var.csv
+  method: SetInitialConditions
+  states_file: data/ic_2pop_2var.csv
+  allow_missing_nodes: TRUE
 
 compartments:
   infection_stage: ["S", "E", "I", "R"]
-  variant: ["A","B"]
+  strain: ["A","B"]
 
 seir:
   integration:
@@ -57,28 +59,24 @@ seir:
   transitions:
     # new infections of susceptible individuals
     - source: [["S"],["A","B"]]
-      destination: [["E"],["A","B"]]]
+      destination: [["E"],["A","B"]]
       rate: [["Ro * gamma"],["1","fB"]]
-      proportional_to: ["source",[["I",["A","B"]]]]
-      proportion_exponent: ["1","1"]
+      proportional_to: [
+        "source",
+        [
+          [["I"]],
+          [["A","B"],
+          ["A","B"]]
+        ]
+      ]
+      proportion_exponent: [["1","1"],["1","1"]]
     # progression of exposed infections
     - source: [["E"],["A","B"]]
       destination: [["I"],["A","B"]]
       rate: [["sigma"],["1","1"]] 
       proportional_to: ["source"]
-      proportion_exponent: ["1"]
-    # recovery from infection
-    - source: [["I"],["A","B"]]
-      destination: [["R"],["A","B"]]
-      rate: [["gamma"],["1","1"]] 
-      proportional_to: ["source"]
-      proportion_exponent: ["1"]
-    # infections of individuals previously infected with variant B with variant A
-    - source: [["R"],["A"]]
-      destination: [["E"],["B"]]
-      rate: [["Ro * gamma"],["fB * eB"]]
-      proportional_to: ["source"]
-      proportional_exponent: ["1"]
+      proportion_exponent: [["1","1"]]
+
 
 interventions:
   scenarios:
