@@ -1,2 +1,2 @@
-place, date, amount, source_infection_stage, destination_infection_stage
+subpop, date, amount, source_infection_stage, destination_infection_stage
 small_province, 2020-02-01, 5, S, E
