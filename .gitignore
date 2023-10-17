@@ -2,3 +2,7 @@
 .RData
 model_output/
 model_output*/
+.R*
+.Rhistory
+*.Rproj
+renv*
