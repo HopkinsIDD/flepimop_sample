@@ -12,13 +12,26 @@ params:
   opt: !r option_list = list(optparse::make_option(c("-c", "--config"), action="store", default=Sys.getenv("CONFIG_PATH", Sys.getenv("CONFIG_PATH")), type='character', help="path to the config file"), optparse::make_option(c("-d", "--data_path"), action="store", default=Sys.getenv("DATA_PATH", Sys.getenv("DATA_PATH")), type='character', help="path to the data repo"), optparse::make_option(c("-u","--run-id"), action="store", dest = "run_id", type='character', help="Unique identifier for this run", default = Sys.getenv("FLEPI_RUN_INDEX",flepicommon::run_id())),  optparse::make_option(c("-R", "--results-path"), action="store", dest = "results_path",  type='character', help="Path for model output", default = Sys.getenv("FS_RESULTS_PATH", Sys.getenv("FS_RESULTS_PATH")))) # parameter options that will be used if report ran "online". If "offline", options below will be used
   config: config_sample_2pop.yml #name of configuration file
   #results_path:  # path to the project folder within which the model_output directory lies. Comment out if current directory 
-  run_id: 20231016_164028
-  #seir_modifier_scenario:  # name of the scenario to plot results for. Leave blank if ... 
-  #outcomes_modifier_scenario: 
+  #run_id: # name of the run_id to plot results for. Required if multiple run_ids in model_output. Comment out if only one run_id in config
+  #seir_modifier_scenario:  # name of the scenario to plot results for. Required if multiple scenarios in config. Comment out if no scecnarios in config
+  #outcomes_modifier_scenario: # name of the scenario to plot results for. Required if multiple scenarios in config. Comment out if no scecnarios in config
   continue_on_error: yes
 ---
 
 ```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE,
+	cache = TRUE,
+	cache.lazy = FALSE
+)
+# knitr::opts_knit$set(root.dir = opt$data_path)
+
+```
+
+```{r install-packages, include=FALSE}
 
 # Only need to run this cell once. Takes quite a long time the first time, because downloads and installs many packages
 
@@ -50,16 +63,9 @@ suppressMessages(library(ggforce))
 suppressMessages(library(ggforce))
 suppressMessages(library(gridExtra))
 
-knitr::opts_chunk$set(
-	echo = FALSE,
-	message = FALSE,
-	warning = FALSE,
-	cache = TRUE,
-	cache.lazy = FALSE
-)
-# knitr::opts_knit$set(root.dir = opt$data_path)
 
 ```
+
 
 ```{r parameter-setup}
 

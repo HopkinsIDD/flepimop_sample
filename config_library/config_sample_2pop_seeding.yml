@@ -19,7 +19,7 @@ compartments:
 seir:
   integration:
     method: rk4
-    dt: 1
+    dt: 1 / 10
   parameters:
     sigma:
       value: 1 / 4

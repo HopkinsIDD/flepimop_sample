@@ -3,15 +3,15 @@ setup_name: minimal
 start_date: 2020-01-31
 end_date: 2020-05-31
 data_path: data
-nslots: 1
+nslots: 4
 
 subpop_setup:
   geodata: geodata_sample_2pop.csv
   mobility: mobility_sample_2pop.csv
 
 seeding:
-  method: FromFile
-  seeding_file: data/seeding_2pop.csv
+  method: PoissonDistributed
+  lambda_file: data/seeding_2pop.csv
 
 compartments:
   infection_stage: ["S", "E", "I", "R"]
@@ -19,7 +19,7 @@ compartments:
 seir:
   integration:
     method: rk4
-    dt: 1
+    dt: 1 / 10
   parameters:
     sigma:
       value: 1 / 4
