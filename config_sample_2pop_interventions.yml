@@ -22,18 +22,11 @@ seir:
     dt: 1 / 10
   parameters:
     sigma:
-      value:
-        distribution: fixed
-        value: 1 / 4
+      value: 1 / 4
     gamma:
-      value:
-        distribution: fixed
-        value: 1 / 5
+      value: 1 / 5
     Ro:
-      value:
-        distribution: uniform
-        low: 2
-        high: 3
+      value: 3
   transitions:
     - source: ["S"]
       destination: ["E"]
@@ -51,16 +44,13 @@ seir:
       proportional_to: ["I"]
       proportion_exponent: ["1"]
 
-interventions:
-  scenarios:
-    - None
+seir_modifiers:
   settings:
     None:
-      template: SinglePeriodModifier
-      parameter: r0
+      method: SinglePeriodModifier
+      parameter: R0
       period_start_date: 2020-04-01
       period_end_date: 2020-05-15
-      value:
-        distribution: fixed
-        value: 0
+      subpop: "all"
+      value: 0
 

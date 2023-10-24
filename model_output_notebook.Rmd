@@ -10,7 +10,7 @@ output:
 params:
   report_location: offline # if report is being run within an environment in which a model run was already specified and that already has all                                flepmiop packages installed, "online", otherwise, "offline"
   opt: !r option_list = list(optparse::make_option(c("-c", "--config"), action="store", default=Sys.getenv("CONFIG_PATH", Sys.getenv("CONFIG_PATH")), type='character', help="path to the config file"), optparse::make_option(c("-d", "--data_path"), action="store", default=Sys.getenv("DATA_PATH", Sys.getenv("DATA_PATH")), type='character', help="path to the data repo"), optparse::make_option(c("-u","--run-id"), action="store", dest = "run_id", type='character', help="Unique identifier for this run", default = Sys.getenv("FLEPI_RUN_INDEX",flepicommon::run_id())),  optparse::make_option(c("-R", "--results-path"), action="store", dest = "results_path",  type='character', help="Path for model output", default = Sys.getenv("FS_RESULTS_PATH", Sys.getenv("FS_RESULTS_PATH")))) # parameter options that will be used if report ran "online". If "offline", options below will be used
-  config: config_sample_2pop.yml #name of configuration file
+  config: config_sample_2pop_ic_FF.yml #name of configuration file
   #results_path:  # path to the project folder within which the model_output directory lies. Comment out if current directory 
   #run_id: # name of the run_id to plot results for. Required if multiple run_ids in model_output. Comment out if only one run_id in config
   #seir_modifier_scenario:  # name of the scenario to plot results for. Required if multiple scenarios in config. Comment out if no scecnarios in config
