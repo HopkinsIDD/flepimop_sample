@@ -2,16 +2,18 @@ name: sample_2pop
 setup_name: minimal
 start_date: 2020-01-31
 end_date: 2020-05-31
-data_path: data
+data_path: model_input
 nslots: 1
 
 subpop_setup:
   geodata: geodata_sample_2pop.csv
   mobility: mobility_sample_2pop.csv
 
-seeding:
-  method: FromFile
-  seeding_file: data/seeding_2pop.csv
+initial_conditions:
+  method: SetInitialConditions
+  initial_conditions_file: model_input/ic_2pop.csv
+  allow_missing_subpops: TRUE
+  allow_missing_compartments: TRUE
 
 compartments:
   infection_stage: ["S", "E", "I", "R"]

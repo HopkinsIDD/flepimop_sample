@@ -2,7 +2,7 @@ name: sample_2pop
 setup_name: minimal
 start_date: 2020-04-01
 end_date: 2020-05-31
-data_path: data
+data_path: model_input
 nslots: 1
 
 subpop_setup:
@@ -11,7 +11,8 @@ subpop_setup:
 
 initial_conditions:
   method: FromFile
-  initial_conditions_file: data/model_output_example/sample_2pop/20231018_133013/seir/000000001.20231018_133013.seir.parquet
+  # take the output from another model run (which started on 2020-01-31) on start_date
+  initial_conditions_file: model_input/model_output_example/sample_2pop/20231018_133013/seir/000000001.20231018_133013.seir.parquet
   allow_missing_nodes: FALSE
   allow_missing_compartments: FALSE
 

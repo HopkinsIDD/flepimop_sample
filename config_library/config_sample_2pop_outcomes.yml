@@ -2,16 +2,18 @@ name: sample_2pop
 setup_name: minimal
 start_date: 2020-01-31
 end_date: 2020-05-31
-data_path: data
+data_path: model_input
 nslots: 1
 
-spatial_setup:
+subpop_setup:
   geodata: geodata_sample_2pop.csv
   mobility: mobility_sample_2pop.csv
 
-seeding:
-  method: FromFile
-  seeding_file: data/seeding_2pop.csv
+initial_conditions:
+  method: SetInitialConditions
+  initial_conditions_file: model_input/ic_2pop.csv
+  allow_missing_subpops: TRUE
+  allow_missing_compartments: TRUE
 
 compartments:
   infection_stage: ["S", "E", "I", "R"]
@@ -19,7 +21,7 @@ compartments:
 seir:
   integration:
     method: rk4
-    dt: 1 / 10
+    dt: 1
   parameters:
     sigma:
       value: 1 / 4
@@ -44,13 +46,24 @@ seir:
       proportional_to: ["I"]
       proportion_exponent: ["1"]
 
-seir_modifiers:
-  settings:
-    None:
-      method: SinglePeriodModifier
-      parameter: R0
-      period_start_date: 2020-04-01
-      period_end_date: 2020-05-15
-      subpop: "all"
-      value: 0
-
+outcomes:
+  method: delayframe
+  outcomes:
+    incidHosp: #incidence of hospitalizations
+      source:
+        incidence:
+          infection_stage: "I"
+      probability:
+        value: 0.05
+      delay:
+        value: 7
+      duration:
+        value: 10
+        name: currHosp # will track number of current hospitalizations (ie prevalence)
+    incidDeath: #incidence of deaths
+      source: incidHosp
+      probability:
+        value: 0.2
+      delay:
+        value: 14
+ 
