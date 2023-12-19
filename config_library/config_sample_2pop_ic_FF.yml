@@ -12,7 +12,7 @@ subpop_setup:
 initial_conditions:
   method: FromFile
   # take the output from another model run (which started on 2020-01-31) on start_date
-  initial_conditions_file: model_input/model_output_example/sample_2pop/20231018_133013/seir/000000001.20231018_133013.seir.parquet
+  initial_conditions_file: model_input/model_output_example/sample_2pop/20231219_020155/seir/000000001.20231219_020155.seir.parquet
   allow_missing_nodes: FALSE
   allow_missing_compartments: FALSE
 
@@ -29,7 +29,7 @@ seir:
     gamma:
       value: 1 / 5
     Ro:
-      value: 3
+      value: 2.5
   transitions:
     - source: ["S"]
       destination: ["E"]

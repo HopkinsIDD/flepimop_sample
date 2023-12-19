@@ -1,6 +1,6 @@
 name: sample_2pop
 setup_name: minimal
-start_date: 2020-01-31
+start_date: 2020-02-01
 end_date: 2020-05-31
 data_path: model_input
 nslots: 1
@@ -28,7 +28,7 @@ seir:
     gamma:
       value: 1 / 5
     Ro:
-      value: 3
+      value: 2.5
   transitions:
     - source: ["S"]
       destination: ["E"]

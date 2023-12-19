@@ -1,6 +1,6 @@
 name: sample_2pop
 setup_name: minimal
-start_date: 2020-01-31
+start_date: 2020-02-01
 end_date: 2020-08-31
 data_path: model_input
 nslots: 1
@@ -28,7 +28,7 @@ seir:
     gamma:
       value: 1 / 5
     Ro:
-      value: 3
+      value: 2.5
   transitions:
     - source: ["S"]
       destination: ["E"]
@@ -53,18 +53,18 @@ seir_modifiers:
   modifiers:
     R0_lockdown:
       method: SinglePeriodModifier
-      parameter: R0
-      period_start_date: 2020-04-01
-      period_end_date: 2020-05-15
+      parameter: Ro
+      period_start_date: 2020-03-15
+      period_end_date: 2020-05-01
       subpop: "all"
-      value: 0.5
+      value: 0.8
     R0_relax:
       method: SinglePeriodModifier
-      parameter: R0
-      period_start_date: 2020-05-15
+      parameter: Ro
+      period_start_date: 2020-05-01
       period_end_date: 2020-07-01
       subpop: "all"
-      value: 0.2
+      value: 0.4
     R0_all:
       method: StackedModifier
       modifiers: ["R0_lockdown","R0_relax"]
@@ -108,7 +108,7 @@ outcome_modifiers:
       method: SinglePeriodModifier
       parameter: incidCase
       subpop: "all"
-      period_start_date: 2020-01-31
+      period_start_date: 2020-02-01
       period_end_date: 2020-06-01
       value: 0.5
 
