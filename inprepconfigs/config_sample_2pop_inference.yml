@@ -1,19 +1,19 @@
 name: sample_2pop
 setup_name: minimal
-start_date: 2020-01-31
-end_date: 2020-05-31
-data_path: data
+start_date: 2020-02-01
+end_date: 2020-08-31
+data_path: model_input
 nslots: 1
 
-spatial_setup:
+subpop_setup:
   geodata: geodata_sample_2pop.csv
   mobility: mobility_sample_2pop.csv
 
-seeding:
-  method: FolderDraw
-  lambda_file: data/seeding.csv
-  date_sd: 0
-  amount_sd: 0
+initial_conditions:
+  method: SetInitialConditions
+  initial_conditions_file: model_input/ic_2pop.csv
+  allow_missing_subpops: TRUE
+  allow_missing_compartments: TRUE
 
 compartments:
   infection_stage: ["S", "E", "I", "R"]
@@ -21,28 +21,20 @@ compartments:
 seir:
   integration:
     method: rk4
-    dt: 1 / 10
-    stoch_traj_flag: 0
+    dt: 1
   parameters:
     sigma:
-      value:
-        distribution: fixed
-        value: 1 / 4
+      value: 1 / 4
     gamma:
-      value:
-        distribution: fixed
-        value: 1 / 5
+      value: 1 / 5
     Ro:
-      value:
-        distribution: uniform
-        low: 2
-        high: 3
+      value: 2.5
   transitions:
     - source: ["S"]
       destination: ["E"]
       rate: ["Ro * gamma"]
       proportional_to: [["S"],["I"]]
-      proportion_exponent: ["1"]
+      proportion_exponent: ["1","1"]
     - source: ["E"]
       destination: ["I"]
       rate: ["sigma"]
@@ -54,38 +46,120 @@ seir:
       proportional_to: ["I"]
       proportion_exponent: ["1"]
 
-interventions:
+seir_modifiers:
   scenarios:
-    - None
-  settings:
-    None:
-      template: SinglePeriodModifier
-      parameter: r0
-      period_start_date: 2020-04-01
-      period_end_date: 2020-05-15
-      value:
-        distribution: fixed
-        value: 0
+    - Ro_all
+  modifiers:
+    Ro_mod: # assume same for all subpopulations
+      method: SinglePeriodModifier
+      parameter: Ro
+      period_start_date: 2020-02-01
+      period_end_date: 2020-08-31
+      subpop: "all"
+      subpop_groups: "all"
+      value: 
+        distribution: truncnorm
+        mean: 0
+        sd: 0.001
+        a: -1
+        b: 1
+      perturbation:
+        distribution: truncnorm
+        mean: 0
+        sd: 0.025
+        a: -0.1
+        b: 0.1
+    Ro_lockdown: # allow to vary by subpopulation
+      method: SinglePeriodModifier
+      parameter: Ro
+      period_start_date: 2020-03-15
+      period_end_date: 2020-05-01
+      subpop: "all"
+      value: 
+        distribution: truncnorm
+        mean: 0.8
+        sd: 0.001
+        a: 0
+        b: 1
+      perturbation:
+        distribution: truncnorm
+        mean: 0
+        sd: 0.025
+        a: -0.1
+        b: 0.1
+    Ro_all:
+      method: StackedModifier
+      modifiers: ["Ro_mod","Ro_lockdown"]
+
 
 outcomes:
   method: delayframe
+  outcomes:
+    incidCase: #incidence of detected cases
+      source:
+        incidence:
+          infection_stage: "I"
+      probability:
+        value: 0.5
+      delay:
+        value: 5
+    incidHosp: #incidence of hospitalizations
+      source:
+        incidence:
+          infection_stage: "I"
+      probability:
+        value: 0.05
+      delay:
+        value: 7
+      duration:
+        value: 10
+        name: currHosp # will track number of current hospitalizations (ie prevalence)
+    incidDeath: #incidence of deaths
+      source: incidHosp
+      probability:
+        value: 0.2
+      delay:
+        value: 14
+
+outcome_modifiers:
   scenarios:
-    - None
-  settings:
-    None:
-      incidI:
-        source:
-          incidence:
-            infection_stage: "I1"
-        probability:
-          value:
-            distribution: fixed
-            value: 1
-        delay:
-          value:
-            distribution: fixed
-            value: 0
+    - test_limits
+  modifiers:
+    # assume that due to limitations in testing, initially the case detection probability was lower
+    test_limits:
+      method: SinglePeriodModifier
+      parameter: incidCase
+      subpop: "all"
+      period_start_date: 2020-02-01
+      period_end_date: 2020-06-01
+      value: 
+        distribution: truncnorm
+        mean: 0.5
+        sd: 0.001
+        a: 0
+        b: 1
+      perturbation:
+        distribution: truncnorm
+        mean: 0
+        sd: 0.025
+        a: -0.1
+        b: 0.1
 
 inference:
   iterations_per_slot: 1
-  do_inference: FALSE
+  do_inference: TRUE
+  gt_data_path: data/sample_2pop_cases.csv 
+  statistics:
+    sum_hosp_historic:
+      name: sum_hosp
+      aggregator: sum
+      period: "1 weeks"
+      #gt_start_date:
+      #gt_end_date: 
+      sim_var: incidH
+      data_var: incidH
+      remove_na: TRUE
+      add_one: TRUE
+      likelihood: 
+        dist: norm_cov
+        param: 0.3

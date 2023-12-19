@@ -48,26 +48,26 @@ seir:
 
 seir_modifiers:
   scenarios:
-    - R0_lockdown
-    - R0_all
+    - Ro_lockdown
+    - Ro_all
   modifiers:
-    R0_lockdown:
+    Ro_lockdown:
       method: SinglePeriodModifier
       parameter: Ro
       period_start_date: 2020-03-15
       period_end_date: 2020-05-01
       subpop: "all"
       value: 0.8
-    R0_relax:
+    Ro_relax:
       method: SinglePeriodModifier
       parameter: Ro
       period_start_date: 2020-05-01
       period_end_date: 2020-07-01
       subpop: "all"
       value: 0.4
-    R0_all:
+    Ro_all:
       method: StackedModifier
-      modifiers: ["R0_lockdown","R0_relax"]
+      modifiers: ["Ro_lockdown","Ro_relax"]
 
 
 outcomes:
