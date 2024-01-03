@@ -10,13 +10,13 @@ output:
 params:
   report_location: offline # if report is being run within an environment in which a model run was already specified and that already has all                                flepmiop packages installed, "online", otherwise, "offline"
   opt: !r option_list = list(optparse::make_option(c("-c", "--config"), action="store", default=Sys.getenv("CONFIG_PATH", Sys.getenv("CONFIG_PATH")), type='character', help="path to the config file"), optparse::make_option(c("-d", "--data_path"), action="store", default=Sys.getenv("DATA_PATH", Sys.getenv("DATA_PATH")), type='character', help="path to the data repo"), optparse::make_option(c("-u","--run-id"), action="store", dest = "run_id", type='character', help="Unique identifier for this run", default = Sys.getenv("FLEPI_RUN_INDEX",flepicommon::run_id())),  optparse::make_option(c("-R", "--results-path"), action="store", dest = "results_path",  type='character', help="Path for model output", default = Sys.getenv("FS_RESULTS_PATH", Sys.getenv("FS_RESULTS_PATH")))) # parameter options that will be used if report ran "online". If "offline", options below will be used
-  config: config_sample_2popF.yml #name of configuration file
+  config: config_sample_2pop_modifiers.yml #name of configuration file
   model_output_dir: model_output #usually model_output, but if results were moved, might be different
   #results_path:  # path to the project folder within which the model_output directory lies. Comment out if current directory 
   #run_id: # name of the run_id to plot results for. Required if multiple run_ids in model_output. Comment out if only one run_id in config
-  #seir_modifier_scenario: R0_all
+  seir_modifier_scenario: Ro_all
   # name of the scenario to plot results for. Required if multiple scenarios in config. Comment out if no scecnarios in config
-  #outcome_modifier_scenario: test_limits
+  outcome_modifier_scenario: test_limits
   # name of the scenario to plot results for. Required if multiple scenarios in config. Comment out if no scecnarios in config
   # NOTE: Eventually would want this to be able to plot multipe scenarios or run_ids on the same graphs?
   continue_on_error: yes
@@ -476,17 +476,8 @@ if(length(unique(hosp_outputs_global$slot)) > 1){
 ```
 
 
-File only updated until here
-
-```{r}
-knitr::knit_exit()
-```
-
-
 # Infection model: SNPI model output
 Here are the SEIR parameter modifiers for your model. If inference is run, parameters are coloured by their likelihoods in a given subpopulation. 
-
-PROBLEM: Not working for non-inference runs currently
 
 ```{r snpi, results='hide',fig.keep='all',eval = eval_snpi}
 # read in model outputs
@@ -507,7 +498,7 @@ snpi_plots <- lapply(node_names,
                        if(!grepl(',', i)){
                          snpi_outputs_global %>%
                            {if(inference)
-                             .[llik, on = c("subpop", "slot")] } %>%
+                             .[llik, on = c("subpop", "slot")] else .} %>%
                            .[subpop == i] %>%
                            # .[subpop == "sample_state"] %>%
                            ggplot(aes(npi_name,reduction)) +
@@ -559,7 +550,6 @@ snpi_plots <- lapply(node_names,
                        }
                      }
 )
-
 if(length(snpi_plots)!=1){
   print(do.call("grid.arrange", c(snpi_plots, ncol=4)))
 }else{
@@ -592,7 +582,8 @@ if(inference){
 hnpi_plots <- lapply(node_names,
                      function(i){
                        hnpi_outputs_global %>%
-                         .[llik, on = c("subpop", "slot")] %>%
+                         {if(inference)
+                             .[llik, on = c("subpop", "slot")] else .}%>%
                          .[subpop == i] %>%
                          ggplot(aes(npi_name,reduction)) + 
                          geom_violin() +
@@ -624,26 +615,26 @@ If you ran inference, here are some analyses that might be helpful!
 
 llik_outputs_int <- setDT(import_model_outputs(scenario_run_dir, inference,  "llik", 'global', 'intermediate'))
 
-print(
-  llik_outputs_int %>% 
-    ggplot() + 
-    geom_line(aes(iter,accept_prob, group = as.factor(slot))) +
-    guides(colour = "none") + 
-    labs(x = 'iterations', y = "probability of acceptance") +
-    facet_wrap(~subpop) +
-  theme_classic() + theme_small
-)
+# print(
+#   llik_outputs_int %>% 
+#     ggplot() + 
+#     geom_line(aes(iter,accept_prob, group = as.factor(slot))) +
+#     guides(colour = "none") + 
+#     labs(x = 'iterations', y = "probability of acceptance") +
+#     facet_wrap(~subpop) +
+#   theme_classic() + theme_small
+# )
 
 
-print(
-  llik_outputs_int %>% 
-  ggplot() + 
-  geom_line(aes(iter,accept_avg, group = as.factor(slot))) +
-  guides(colour = "none") + 
-  labs(x = 'iterations', y = "acceptance average") +
-  facet_wrap(~subpop) +
-  theme_classic() + theme_small
-)
+# print(
+#   llik_outputs_int %>% 
+#   ggplot() + 
+#   geom_line(aes(iter,accept_avg, group = as.factor(slot))) +
+#   guides(colour = "none") + 
+#   labs(x = 'iterations', y = "acceptance average") +
+#   facet_wrap(~subpop) +
+#   theme_classic() + theme_small
+# )
 
 llik_outputs_int %>% 
   pivot_longer(cols = c("ll","accept_avg","accept","accept_prob")) %>% ggplot() +
@@ -651,6 +642,7 @@ llik_outputs_int %>%
   facet_grid(name ~ subpop, scales = 'free_y')+
   labs(x = 'iterations', y = "llikelihood stats") +
   theme_minimal() + theme_small
+
 
 
 ```
