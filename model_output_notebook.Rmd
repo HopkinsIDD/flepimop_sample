@@ -10,7 +10,7 @@ output:
 params:
   report_location: offline # if report is being run within an environment in which a model run was already specified and that already has all                                flepmiop packages installed, "online", otherwise, "offline"
   opt: !r option_list = list(optparse::make_option(c("-c", "--config"), action="store", default=Sys.getenv("CONFIG_PATH", Sys.getenv("CONFIG_PATH")), type='character', help="path to the config file"), optparse::make_option(c("-d", "--data_path"), action="store", default=Sys.getenv("DATA_PATH", Sys.getenv("DATA_PATH")), type='character', help="path to the data repo"), optparse::make_option(c("-u","--run-id"), action="store", dest = "run_id", type='character', help="Unique identifier for this run", default = Sys.getenv("FLEPI_RUN_INDEX",flepicommon::run_id())),  optparse::make_option(c("-R", "--results-path"), action="store", dest = "results_path",  type='character', help="Path for model output", default = Sys.getenv("FS_RESULTS_PATH", Sys.getenv("FS_RESULTS_PATH")))) # parameter options that will be used if report ran "online". If "offline", options below will be used
-  config: config_sample_2pop_modifiers.yml #name of configuration file
+  config: config_sample_2pop_inference.yml #name of configuration file
   model_output_dir: model_output #usually model_output, but if results were moved, might be different
   #results_path:  # path to the project folder within which the model_output directory lies. Comment out if current directory 
   #run_id: # name of the run_id to plot results for. Required if multiple run_ids in model_output. Comment out if only one run_id in config
@@ -479,7 +479,7 @@ if(length(unique(hosp_outputs_global$slot)) > 1){
 # Infection model: SNPI model output
 Here are the SEIR parameter modifiers for your model. If inference is run, parameters are coloured by their likelihoods in a given subpopulation. 
 
-```{r snpi, results='hide',fig.keep='all',eval = eval_snpi}
+```{r snpi, results='hide',fig.keep='all',eval = eval_snpi} 
 # read in model outputs
 snpi_outputs_global <- setDT(import_model_outputs(scenario_run_dir, inference,  "snpi", 'global', 'final'))
 #node_names <- unique(snpi_outputs_global %>% .[ , get(subpop)])
@@ -528,7 +528,7 @@ snpi_plots <- lapply(node_names,
 
                          snpi_outputs_global %>%
                            {if(inference)
-                             .[ll_across_nodes, on = c("slot")]} %>%
+                             .[ll_across_nodes, on = c("slot")] else .} %>%
                            # .[subpop == "sample_state"] %>%
                            .[subpop == i] %>%
                            ggplot(aes(npi_name,reduction)) +
@@ -656,8 +656,10 @@ In your inference method you specified that your model be fit to `r names(config
 
   # for the single season to plot after full trajectory
     
-  plot_start_date <- as.Date("2008-09-01")
-  plot_end_date <- as.Date("2009-08-31")
+  # plot_start_date <- as.Date("2008-09-01")
+  # plot_end_date <- as.Date("2009-08-31")
+  plot_start_date <- config$start_date
+  plot_end_date <- config$end_date
 
 
   # get all outcome variables
@@ -902,12 +904,12 @@ for(i in 1:length(fit_stats)){
                                   .[, date := lubridate::as_date(date)] %>%
                                   .[subpop == e] %>%
                                   ggplot() +
-                                  geom_line(aes(lubridate::as_date(date), get(statistics$data_var),
+                                  geom_line(aes(lubridate::as_date(date), get(statistics$sim_var),
                                                 group = slot, color = ll)) + #, linetype = llik_bin
                                   scale_linetype_manual(values = c(1, 2), name = "likelihood\nbin") +
                                   scale_color_viridis_c(option = "D", name = "log\nlikelihood") +
                                   {if(inference & outcome_vars_[i] %in% colnames(gt_data))
-                                    geom_point(data = gt_data %>% .[, .(date,subpop, value = get(outcome_vars_[i]))],
+                                    geom_point(data = gt_data %>% .[, .(date,subpop, value = get(statistics$data_var))],
                                                aes(lubridate::as_date(date), value), color = 'firebrick', alpha = 0.1)
                                   } +
                                   facet_wrap(~subpop, scales = 'free') +
@@ -919,7 +921,7 @@ for(i in 1:length(fit_stats)){
     )
     
     if(length(hosp_llik_plots) != 1){
-      print(do.call("grid.arrange", c(hosp_llik_plots, ncol=4)))
+      print(do.call("grid.arrange", c(hosp_llik_plots, ncol=2)))
     }else{
       print(hosp_llik_plots[[1]])
     }

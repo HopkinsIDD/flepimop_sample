@@ -156,7 +156,7 @@ inference:
       period: "1 weeks"
       #gt_start_date:
       #gt_end_date: 
-      sim_var: incidH
+      sim_var: incidHosp
       data_var: incidH
       remove_na: TRUE
       add_one: TRUE
