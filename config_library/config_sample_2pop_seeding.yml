@@ -1,19 +1,17 @@
 name: sample_2pop
 setup_name: minimal
-start_date: 2020-01-31
+start_date: 2020-01-01
 end_date: 2020-05-31
-data_path: data
+data_path: model_input
 nslots: 1
 
-spatial_setup:
+subpop_setup:
   geodata: geodata_sample_2pop.csv
   mobility: mobility_sample_2pop.csv
-  popnodes: population
-  nodenames: province_name
 
 seeding:
   method: FromFile
-  seeding_file: data/seeding_2pop.csv
+  seeding_file: model_input/seeding_2pop.csv
 
 compartments:
   infection_stage: ["S", "E", "I", "R"]
@@ -21,21 +19,14 @@ compartments:
 seir:
   integration:
     method: rk4
-    dt: 1 / 10
+    dt: 1
   parameters:
     sigma:
-      value:
-        distribution: fixed
-        value: 1 / 4
+      value: 1 / 4
     gamma:
-      value:
-        distribution: fixed
-        value: 1 / 5
+      value: 1 / 5
     Ro:
-      value:
-        distribution: uniform
-        low: 2
-        high: 3
+      value: 2.5
   transitions:
     - source: ["S"]
       destination: ["E"]
@@ -53,16 +44,4 @@ seir:
       proportional_to: ["I"]
       proportion_exponent: ["1"]
 
-interventions:
-  scenarios:
-    - None
-  settings:
-    None:
-      template: Reduce
-      parameter: r0
-      period_start_date: 2020-04-01
-      period_end_date: 2020-05-15
-      value:
-        distribution: fixed
-        value: 0
 
