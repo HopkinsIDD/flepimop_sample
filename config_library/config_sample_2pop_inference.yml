@@ -59,9 +59,9 @@ seir_modifiers:
       subpop_groups: "all"
       value: 
         distribution: truncnorm
-        mean: 0
+        mean: .2
         sd: 0.001
-        a: -1
+        a: 0
         b: 1
       perturbation:
         distribution: truncnorm
