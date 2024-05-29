@@ -6,8 +6,8 @@ data_path: model_input
 nslots: 1
 
 subpop_setup:
-  geodata: geodata_sample_2pop.csv
-  mobility: mobility_sample_2pop.csv
+  geodata: model_input/geodata_sample_2pop.csv
+  mobility: model_input/mobility_sample_2pop.csv
 
 initial_conditions:
   method: SetInitialConditions
